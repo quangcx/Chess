@@ -1,6 +1,7 @@
 .board {
     width: 400px;
-    margin: auto
+    margin: auto;
+    position: relative;
 }
 
 .info {
@@ -11,4 +12,30 @@
 .move-history {
     max-height: 100px;
     overflow-y: scroll;
+}
+
+#messages {
+    position: absolute;
+    height: 400px;
+    width: 30%;
+    top: 0;
+    left: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#form {
+    position: absolute;
+    top: 450px;
+}
+
+#btn-mode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 75px;
+}
+
+button {
+    cursor: pointer;
 }

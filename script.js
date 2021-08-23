@@ -1,6 +1,3 @@
-var board,
-    game = new Chess();
-
 /*The "AI" part starts here */
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
@@ -148,9 +145,6 @@ var kingEvalWhite = [
 
 var kingEvalBlack = reverseArray(kingEvalWhite);
 
-
-
-
 var getPieceValue = function (piece, x, y) {
     if (piece === null) {
         return 0;
@@ -283,13 +277,64 @@ var greySquare = function(square) {
     squareEl.css('background', background);
 };
 
-var cfg = {
-    draggable: true,
-    position: 'start',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onMouseoutSquare: onMouseoutSquare,
-    onMouseoverSquare: onMouseoverSquare,
-    onSnapEnd: onSnapEnd
+/** Handle move when play with friend */
+
+var handleMove = function(source, target) {
+    var move = game.move({from: source, to: target});
+    if (move === null) return 'snapback';
+    socket.emit('move', move);
 };
-board = ChessBoard('board', cfg);
+
+/** Apply chess library */
+
+var board;
+var game;
+
+var socket = io();
+
+window.onload = function() {
+    var playWithFriend = document.getElementById('play-with-friend');
+    var playWithMachine = document.getElementById('play-with-machine');
+    var info = document.getElementById('ai-info');
+    playWithFriend.addEventListener('click', function() {
+        info.style.display = 'none';
+        initGame('friend');
+    });
+    playWithMachine.addEventListener('click', function() {
+        info.style.display = 'block';
+        initGame('machine');
+    });
+    
+    playWithFriend.click();
+};
+
+var initGame = function(mode) {
+    var cfg;
+    if (mode == 'friend') {
+        cfg = {
+            draggable: true,
+            position: 'start',
+            onDrop: handleMove
+        };
+    }
+
+    if (mode == 'machine') {
+        cfg = {
+            draggable: true,
+            position: 'start',
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onMouseoutSquare: onMouseoutSquare,
+            onMouseoverSquare: onMouseoverSquare,
+            onSnapEnd: onSnapEnd
+        };
+    }
+    
+    board = new ChessBoard('board', cfg);
+    game = new Chess();
+};
+
+socket.on('move', function(move) {
+    game.move(move);
+    board.position(game.fen());
+});

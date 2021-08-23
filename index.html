@@ -1,39 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="lib/chessboardjs/css/chessboard-0.3.0.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div id="board" class="board"></div>
-<div class="info">
-    Search depth:
-    <select id="search-depth">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3" selected>3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="lib/chessboardjs/css/chessboard-0.3.0.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="board" class="board"></div>
+        <div id="btn-mode">
+            <button id="play-with-friend">Play with Friend</button>
+            <button id="play-with-machine">Play with Machine</button>
+        </div>
+        <div id="ai-info" class="info">
+            Search depth:
+            <select id="search-depth">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
 
-    <br>
-    <span>Positions evaluated: <span id="position-count"></span></span>
-    <br>
-    <span>Time: <span id="time"></span></span>
-    <br>
-    <span>Positions/s: <span id="positions-per-s"></span> </span>
-    <br>
-    <br>
-    <div id="move-history" class="move-history">
-    </div>
-</div>
-<script src="lib/jquery/jquery-3.2.1.min.js"></script>
-<script src="lib/chessboardjs/js/chess.js"></script>
-<script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
-<script src="script.js"></script>
-<script>
+            <br>
+            <span>Positions evaluated: <span id="position-count"></span></span>
+            <br>
+            <span>Time: <span id="time"></span></span>
+            <br>
+            <span>Positions/s: <span id="positions-per-s"></span> </span>
+            <br>
+            <br>
+            <div id="move-history" class="move-history">
+            </div>
+        </div>
+        <ul id="messages">Messages:</ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" /><button>Send</button>
+        </form>
+        <script src="lib/jquery/jquery-3.2.1.min.js"></script>
+        <script src="lib/chessboardjs/js/chess.js"></script>
+        <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="script.js"></script>
+        <script>
+            var messages = document.getElementById('messages');
+            var form = document.getElementById('form');
+            var input = document.getElementById('input');
 
-</script>
-</body>
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (input.value) {
+                    socket.emit('chat message', input.value);
+                    input.value = '';
+                }
+                input.focus();
+            });
+
+            socket.on('chat message', function(msg) {
+                var item = document.createElement('li');
+                item.textContent = msg;
+                messages.appendChild(item);
+                messages.scrollTo(0, messages.scrollHeight);
+            });
+        </script>
+    </body>
 </html>
